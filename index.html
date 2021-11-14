@@ -7,12 +7,24 @@
 
     <link rel="stylesheet" href="/style/style.css" />
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4.0.12/dist/vue-router.global.js"></script>
+    <script src="/scripts/base64.js"></script>
     <script type="module" src="/scripts/script.js"></script>
 </head>
 
 <body>
     <div id="app">
-
+        <div id="fileSelectArea">
+            <input :model="svgUrl" />
+            <input type="file" @change="updateFile($event)" />
+        </div>
+        <div id="parameterArea">
+            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter" @input="parameter.value = $event.newValue"></parameter>
+        </div>
+        <div id="svgArea">
+            <svg-renderer :svg="svg" :parameters="parameters" />
+        </div>
     </div>
 </body>
 
