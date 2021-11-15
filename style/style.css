@@ -1,3 +1,37 @@
 #svgArea {
     margin: 20px;
 }
+
+html {
+    background-color: whitesmoke;
+}
+
+.darkmode{
+    background-color: #151515;
+    color: white;
+}
+
+.darkmode input{
+    filter:invert(1);
+}
+.darkmode input[type="file"]{
+    color: black;
+}
+
+
+.darkmode svg *[style*="stroke:"]{
+    stroke:lawngreen;
+}
+.darkmode svg *[style*="stroke:none"], .darkmode svg *[style*="stroke: none"]{
+    stroke:none !important;
+}
+
+.darkmode svg *[style*="fill:"]{
+    fill:lawngreen;
+}
+.darkmode svg :not(*[style*="fill:"]){
+    fill:whitesmoke;
+}
+.darkmode svg *[style*="fill:none"], .darkmode svg *[style*="fill: none"]{
+    fill:none !important;
+}

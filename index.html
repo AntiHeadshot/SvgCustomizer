@@ -16,11 +16,14 @@
 <body>
     <div id="app">
         <div id="fileSelectArea">
-            <input :model="svgUrl" />
+            <input v-model="svgUrl" />
             <input type="file" @change="updateFile($event)" />
+            <div style="display:inline-block;"><input type="checkbox" id="cbxDarkMode" v-model="darkMode" /><label for="cbxDarkMode">dark mode</label>
+            </div>
         </div>
         <div id="parameterArea">
-            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter" @input="parameter.value = $event.newValue"></parameter>
+            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter"
+                @input="parameter.value = $event.newValue"></parameter>
         </div>
         <div id="svgArea">
             <svg-renderer :svg="svg" :parameters="parameters" />

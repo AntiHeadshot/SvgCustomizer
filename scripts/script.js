@@ -1,14 +1,16 @@
 const RootComponent = {
     data() {
         return {
+            darkMode: false,
             svgUrl: "",
             svgFile: "",
             svg: {
                 svg: `<svg viewBox="-30 -30 160 160">
-            <circle r="{{testParam3:range(30,100)|80}}" cx="50" cy="50" stroke="red" fill="none"></circle>
-            <text x="20" y="35" style="font: italic 40px serif; fill: red;">{{testParam1:text|Hello}}</text>
-            <text x="25" y="38" style="font: italic 30px serif; fill: blue;">{{testParam1:text|Hello}}</text>
-            <text x="20" y="35" style="font: bold 20px serif;">{{testParam2:number|10}}</text>
+            <circle r="{{testParam3:range(30,100)|80}}" cx="50" cy="50" style="stroke:red;fill:none"></circle>
+            <text x="20" y="35" style="font: italic 40px serif; fill: red">{{testParam1:text|Hello}}</text>
+            <text x="25" y="38" style="font: italic 30px serif; fill: blue">{{testParam1:text|Hello}}</text>
+            <text x="20" y="35" style="font: bold 20px serif">{{testParam2:number|10}}</text>
+            <text x="25" y="40" style="font: bold 20px serif;fill:none;stroke:blue;">{{testParam2}}</text>
             </svg>`,
                 name: 'defaultFile.svg'
             },
@@ -38,7 +40,14 @@ const RootComponent = {
         }
     },
     watch: {
-        svg(newValue, oldValue) {
+        darkMode(newValue, oldValue) {
+            console.log("mode changed");
+            if (newValue)
+                document.getElementsByTagName('html')[0].classList.add('darkmode');
+            else
+                document.getElementsByTagName('html')[0].classList.remove('darkmode');
+        }
+        , svg(newValue, oldValue) {
             let parameterRegex = /\{\{(?<name>[^:}]*)(:(?<type>[^|}]*))?(\|(?<defaultValue>[^}]*))?\}\}/gm;
             let match;
             let parameters = [];
