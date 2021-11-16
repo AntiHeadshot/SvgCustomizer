@@ -5,13 +5,7 @@ const RootComponent = {
             svgUrl: "",
             svgFile: "",
             svg: {
-                svg: `<svg viewBox="-30 -30 160 160">
-            <circle r="{{testParam3:range(30,100)|80}}" cx="50" cy="50" style="stroke:red;fill:none"></circle>
-            <text x="20" y="35" style="font: italic 40px serif; fill: red">{{testParam1:text|Hello}}</text>
-            <text x="25" y="38" style="font: italic 30px serif; fill: blue">{{testParam1:text|Hello}}</text>
-            <text x="20" y="35" style="font: bold 20px serif">{{testParam2:number|10}}</text>
-            <text x="25" y="40" style="font: bold 20px serif;fill:none;stroke:blue;">{{testParam2}}</text>
-            </svg>`,
+                svg: this.getSvg(),
                 name: 'defaultFile.svg'
             },
             parameters: [
@@ -22,6 +16,55 @@ const RootComponent = {
         };
     },
     methods: {
+        getSvg() {
+            let values = [{ name: "none", value: "none" },
+            { name: "default", value: "" },
+            { name: "black", value: "black" },
+            { name: "red", value: "red" },
+            { name: "blue", value: "blue" },
+            { name: "#red", value: "#ff0000" },
+            { name: "#blue", value: "#0000ff" },
+            { name: "#r", value: "#f00" },
+            { name: "#b", value: "#00f" },
+            { name: "light", value: "#b5b5b5" },
+            { name: "dark", value: "#4b4b4b" },
+            { name: "green", value: "lawngreen" }];
+
+            let width = 20 + 34 * values.length;
+
+            let svg = `<svg viewBox="-20 -20 ${width} ${width}">
+<text font-size="6" text-anchor="end" transform="translate(-4 2) rotate(45)">stroke</text>
+<text font-size="6" text-anchor="end" transform="translate(2 -4) rotate(45)">fill</text>
+`;
+            let pos = 8
+            for (let val of values) {
+                svg += `<text font-size="6" text-anchor="end" transform="translate(-2 ${pos}) rotate(30)">${val.name}</text>
+`;
+                svg += `<text font-size="6" text-anchor="end" transform="translate(${pos} -2) rotate(60)">${val.name}</text>
+`;
+                pos += 34;
+            }
+
+            let fPos = 17;
+            for (let fill of values) {
+                let sPos = 17;
+                for (let stroke of values) {
+                    if (fill.value && stroke.value)
+                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value};stroke:${stroke.value}"></circle>`;
+                    else if (fill.value)
+                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value}"></circle>`;
+                    else if (stroke.value)
+                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="stroke:${stroke.value}"></circle>`;
+                    else
+                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style=""></circle>`;
+                    sPos += 43;
+                }
+                fPos += 34;
+            }
+
+            svg += "</svg>";
+            return svg;
+        },
         forceRerender() {
             this.componentKey += 1;
         },
