@@ -4,34 +4,61 @@
 
 html {
     background-color: whitesmoke;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
 }
 
-.darkmode{
+body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+#fileSelectArea {
+    margin: 20px;
+}
+
+#svgArea {
+    flex-grow: 1;
+}
+
+.darkmode {
     background-color: #151515;
     color: white;
 }
 
-.darkmode input{
-    filter:invert(1);
+.darkmode input {
+    filter: invert(1);
 }
-.darkmode input[type="file"]{
+
+.darkmode svg {
+    filter: url(#invertBrightness);
+}
+
+.darkmode input[type="file"] {
     color: black;
 }
 
-
-.darkmode svg *[style*="stroke:"]{
-    stroke:lawngreen;
-}
-.darkmode svg *[style*="stroke:none"], .darkmode svg *[style*="stroke: none"]{
-    stroke:none !important;
+button {
+    border-radius: 4px;
+    border-color: #0075ff;
+    padding: 6px;
 }
 
-.darkmode svg *[style*="fill:"]{
-    fill:lawngreen;
-}
-.darkmode svg :not(*[style*="fill:"]){
-    fill:whitesmoke;
-}
-.darkmode svg *[style*="fill:none"], .darkmode svg *[style*="fill: none"]{
-    fill:none !important;
+.darkmode button {
+    color: white;
+    background-color: #2b2b2b;
+    border-radius: 4px;
+    border-color: #ff8a00;
+    padding: 6px;
 }

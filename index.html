@@ -1,11 +1,13 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" class="darkmode">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>SvgCustomiz0r</title>
 
     <link rel="stylesheet" href="style/style.css" />
+
+    <script src="https://kit.fontawesome.com/1ddb58c3ae.js" crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js"></script>
     <script src="https://unpkg.com/vue-router@4.0.12/dist/vue-router.global.js"></script>
@@ -15,17 +17,24 @@
 
 <body>
     <div id="app">
-        <div id="fileSelectArea">
-            <input v-model="svgUrl" />
-            <input type="file" @change="updateFile($event)" />
-            <div style="display:inline-block;"><input type="checkbox" id="cbxDarkMode" v-model="darkMode" /><label for="cbxDarkMode">dark mode</label>
+        <div style="display:inline-block;"><input type="checkbox" id="cbxDarkMode" v-model="darkMode" /><label for="cbxDarkMode">dark mode</label><br/>
+            <div id="fileSelectArea">
+                <input type="file" ref="fileInput" @change="updateFile($event)" style="display: none" />
+                <button @click="loadFile()" title="load"><i class="fas fa-file-import"></i></button> {{svgFile}}
             </div>
         </div>
         <div id="parameterArea">
-            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter"
-                @input="parameter.value = $event.newValue"></parameter>
+            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter" @input="parameter.value = $event.newValue"></parameter>
         </div>
         <div id="svgArea">
+            <svg style="display: none">
+                <filter id="invertBrightness">
+                    <feColorMatrix in="SourceGraphic" type="matrix" :values="`1 -1 -1 1 0
+                                                                              -1 1 -1 1 0
+                                                                              -1 -1 1 1 0
+                                                                              0 0 0 1 0`" />
+                </filter>
+            </svg>
             <svg-renderer :svg="svg" :parameters="parameters" />
         </div>
     </div>
