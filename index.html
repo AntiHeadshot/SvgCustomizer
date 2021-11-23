@@ -12,15 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js"></script>
     <script src="https://unpkg.com/vue-router@4.0.12/dist/vue-router.global.js"></script>
     <script src="scripts/base64.js"></script>
-    <script type="module" src="scripts/script.js"></script>
 </head>
 
 <body>
     <div id="app">
-        <div style="display:inline-block;"><input type="checkbox" id="cbxDarkMode" v-model="darkMode" /><label for="cbxDarkMode">dark mode</label><br/>
+        <div style="display:inline-block;">
+            <input type="checkbox" id="cbxDarkMode" v-model="darkMode" /><label for="cbxDarkMode">dark mode</label><br/>
             <div id="fileSelectArea">
                 <input type="file" ref="fileInput" @change="updateFile($event)" style="display: none" />
-                <button @click="loadFile()" title="load"><i class="fas fa-file-import"></i></button> {{svgFile}}
+                <button @click="loadFile()" title="load"><i class="fas fa-file-import"></i></button> {{svgFile}}<br/>
+                <input type="checkbox" id="cbxAllowCode" v-model="allowCode" /><label for="cbxAllowCode">allow code</label>
             </div>
         </div>
         <div id="parameterArea">
@@ -35,9 +36,11 @@
                                                                               0 0 0 1 0`" />
                 </filter>
             </svg>
-            <svg-renderer :svg="svg" :parameters="parameters" />
+            <svg-renderer :svg="svg" :parameters="parameters" :allow-code="allowCode"/>
         </div>
     </div>
+    <!--no module, because not strict-->
+    <script src="scripts/script.js"></script>
 </body>
 
 </html>
