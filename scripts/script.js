@@ -25,7 +25,7 @@ const RootComponent = {
             <text x="10" y="90">m*b = {{{m*b}}}</text>
             <text x="10" y="110">plot = m*(x+c)²+b:</text>
             <g transform="translate(10 210)">
-                <path d="{{{ (()=>{var d=''; console.log(c); for(var x=0;x<=100;x++){d+=(x==0?'M':'L')+x+' '+(100-((x+c)*(x+c)*m+b*100)/100);} return d;})() }}}" stroke="red" fill="none" stroke-width="1"/>
+                <path d="{{{ (()=>{var d=''; for(var x=0;x<=100;x++){d+=(x==0?'M':'L')+x+' '+(100-((x+c)*(x+c)*m+b*100)/100);} return d;})() }}}" stroke="red" fill="none" stroke-width="1"/>
             </g>
             </svg>`;
 
@@ -171,7 +171,6 @@ const RootComponent = {
                 }
             } while (match);
 
-            console.log(parameters);
             return parameters;
         }
 
