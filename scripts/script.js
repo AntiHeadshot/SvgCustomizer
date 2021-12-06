@@ -8,14 +8,13 @@ const RootComponent = {
             svgFile: "",
             svg: {
                 svg,
-                name: 'defaultFile.svg'
+                name: 'functionPlot{{m}}•(x+{{c}})²+{{b}}.svg'
             },
             parameters: this.getParameters(svg)
         };
     },
     methods: {
         getSvg() {
-
             return `<svg>
             <line x1="0" x2="300" y1="0" y2="0"/>
             <text x="10" y="10">{{m:range(min:0.1,max:2,step:0.1)|1}}</text>
@@ -28,55 +27,6 @@ const RootComponent = {
                 <path d="{{{ (()=>{var d=''; for(var x=0;x<=100;x++){d+=(x==0?'M':'L')+x+' '+(100-((x+c)*(x+c)*m+b*100)/100);} return d;})() }}}" stroke="red" fill="none" stroke-width="1"/>
             </g>
             </svg>`;
-
-            let values = [{ name: "none", value: "none" },
-                { name: "default", value: "" },
-                { name: "black", value: "black" },
-                { name: "red", value: "red" },
-                { name: "blue", value: "blue" },
-                { name: "#red", value: "#ff0000" },
-                { name: "#blue", value: "#0000ff" },
-                { name: "#r", value: "#f00" },
-                { name: "#b", value: "#00f" },
-                { name: "light", value: "#b5b5b5" },
-                { name: "dark", value: "#4b4b4b" },
-                { name: "green", value: "lawngreen" },
-                { name: "purple", value: "purple" }
-            ];
-
-            let width = 20 + 34 * values.length;
-
-            let svg = `<svg viewBox="-20 -20 ${width} ${width}">
-<text font-size="6" font-weight="bold" text-anchor="end" transform="translate(-4 2) rotate(30)">stroke</text>
-<text font-size="6" font-weight="bold" text-anchor="end" transform="translate(2 -4) rotate(30)">fill</text>
-`;
-            let pos = 20;
-            for (let val of values) {
-                svg += `<text font-size="6" text-anchor="end" transform="translate(-2 ${pos}) rotate(30)">${val.name}</text>
-`;
-                svg += `<text font-size="6" text-anchor="end" transform="translate(${pos} -2) rotate(30)">${val.name}</text>
-`;
-                pos += 34;
-            }
-
-            let fPos = 17;
-            for (let fill of values) {
-                let sPos = 17;
-                for (let stroke of values) {
-                    if (fill.value && stroke.value)
-                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value};stroke:${stroke.value}"></circle>`;
-                    else if (fill.value)
-                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value}"></circle>`;
-                    else if (stroke.value)
-                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="stroke:${stroke.value}"></circle>`;
-                    else
-                        svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style=""></circle>`;
-                    sPos += 34;
-                }
-                fPos += 34;
-            }
-            svg += "</svg>";
-            return svg;
         },
         forceRerender() {
             this.componentKey += 1;
@@ -230,6 +180,7 @@ app.component("svg-renderer", {
     <button @click="saveSvg()" title="save" style="margin-bottom:20px">
         <i class="fas fa-file-export"></i>
     </button>
+    {{filename}}
     <div v-html="renderedSvg"></div>
     <div style="opacity: 0" ref="svgMeasure"></div>
 </div>`,
@@ -240,12 +191,13 @@ app.component("svg-renderer", {
     },
     data() {
         return {
-            renderedSvg: "LOADING ..."
+            renderedSvg: "<svg><text>LOADING ...</text></svg>",
+            filename: "LOADING ..."
         };
     },
     methods: {
-        renderSvg() {
-            let renderedSvg = this.svg.svg;
+        renderParameters(text) {
+            text;
             //replace calculations
             if (this.allowCode) {
                 let scope = {};
@@ -254,19 +206,19 @@ app.component("svg-renderer", {
 
                 let match;
                 do {
-                    match = new RegExp(`\{\{\{(?<calc>.*?)\}\}\}`, 'gm').exec(renderedSvg);
+                    match = new RegExp(`\{\{\{(?<calc>.*?)\}\}\}`, 'gm').exec(text);
                     if (match) {
                         let result = evalInScope(match.groups.calc, scope);
-                        renderedSvg = renderedSvg.substr(0, match.index) + result + renderedSvg.substr(match.index + match[0].length);
+                        text = text.substr(0, match.index) + result + text.substr(match.index + match[0].length);
                     }
                 }
                 while (match);
             } else {
                 let match
                 do {
-                    match = new RegExp(`\{\{\{([^}]*)\}\}\}`, 'gm').exec(renderedSvg);
+                    match = new RegExp(`\{\{\{([^}]*)\}\}\}`, 'gm').exec(text);
                     if (match) {
-                        renderedSvg = renderedSvg.substr(0, match.index) + "" + renderedSvg.substr(match.index + match[0].length);
+                        text = text.substr(0, match.index) + "" + text.substr(match.index + match[0].length);
                     }
                 }
                 while (match);
@@ -276,14 +228,18 @@ app.component("svg-renderer", {
                 //replace parameters
                 let match
                 do {
-                    match = new RegExp(`\{\{(${param.name})(:[^}]*)?(|[^}]*)?\}\}`, 'gm').exec(renderedSvg);
+                    match = new RegExp(`\{\{(${param.name})(:[^}]*)?(|[^}]*)?\}\}`, 'gm').exec(text);
                     if (match) {
-                        renderedSvg = renderedSvg.substr(0, match.index) + param.value + renderedSvg.substr(match.index + match[0].length);
+                        text = text.substr(0, match.index) + param.value + text.substr(match.index + match[0].length);
                     }
                 }
                 while (match);
             }
-
+            return text;
+        },
+        renderSvg() {
+            let renderedSvg = this.renderParameters(this.svg.svg);
+            
             if (this.$refs.svgMeasure) {
                 this.$refs.svgMeasure.innerHTML = renderedSvg;
                 let bbox = this.$refs.svgMeasure.children[0].getBBox({ stroke: true });
@@ -302,6 +258,7 @@ app.component("svg-renderer", {
             }
 
             this.renderedSvg = renderedSvg;
+            this.filename = this.renderParameters(this.svg.name)
         },
         saveSvg() {
             this.triggerDownload('data:image/svg+xml;base64,' + Base64.encode(this.renderedSvg));
@@ -314,7 +271,8 @@ app.component("svg-renderer", {
             });
 
             let a = document.createElement('a');
-            a.setAttribute('download', this.svg.name);
+
+            a.setAttribute('download', this.filename);
             a.setAttribute('href', imgURI);
             a.setAttribute('target', '_blank');
 
@@ -333,3 +291,55 @@ app.component("svg-renderer", {
 });
 
 const vm = app.mount('#app');
+
+
+function getDarkModeTestSvg() {
+    let values = [{ name: "none", value: "none" },
+    { name: "default", value: "" },
+    { name: "black", value: "black" },
+    { name: "red", value: "red" },
+    { name: "blue", value: "blue" },
+    { name: "#red", value: "#ff0000" },
+    { name: "#blue", value: "#0000ff" },
+    { name: "#r", value: "#f00" },
+    { name: "#b", value: "#00f" },
+    { name: "light", value: "#b5b5b5" },
+    { name: "dark", value: "#4b4b4b" },
+    { name: "green", value: "lawngreen" },
+    { name: "purple", value: "purple" }
+    ];
+
+    let width = 20 + 34 * values.length;
+
+    let svg = `<svg viewBox="-20 -20 ${width} ${width}">
+<text font-size="6" font-weight="bold" text-anchor="end" transform="translate(-4 2) rotate(30)">stroke</text>
+<text font-size="6" font-weight="bold" text-anchor="end" transform="translate(2 -4) rotate(30)">fill</text>
+`;
+    let pos = 20;
+    for (let val of values) {
+        svg += `<text font-size="6" text-anchor="end" transform="translate(-2 ${pos}) rotate(30)">${val.name}</text>
+`;
+        svg += `<text font-size="6" text-anchor="end" transform="translate(${pos} -2) rotate(30)">${val.name}</text>
+`;
+        pos += 34;
+    }
+
+    let fPos = 17;
+    for (let fill of values) {
+        let sPos = 17;
+        for (let stroke of values) {
+            if (fill.value && stroke.value)
+                svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value};stroke:${stroke.value}"></circle>`;
+            else if (fill.value)
+                svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="fill:${fill.value}"></circle>`;
+            else if (stroke.value)
+                svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style="stroke:${stroke.value}"></circle>`;
+            else
+                svg += `<circle r="15" cx="${fPos}" cy="${sPos}" style=""></circle>`;
+            sPos += 34;
+        }
+        fPos += 34;
+    }
+    svg += "</svg>";
+    return svg;
+}
