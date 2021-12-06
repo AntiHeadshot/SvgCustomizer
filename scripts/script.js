@@ -30,18 +30,18 @@ const RootComponent = {
             </svg>`;
 
             let values = [{ name: "none", value: "none" },
-            { name: "default", value: "" },
-            { name: "black", value: "black" },
-            { name: "red", value: "red" },
-            { name: "blue", value: "blue" },
-            { name: "#red", value: "#ff0000" },
-            { name: "#blue", value: "#0000ff" },
-            { name: "#r", value: "#f00" },
-            { name: "#b", value: "#00f" },
-            { name: "light", value: "#b5b5b5" },
-            { name: "dark", value: "#4b4b4b" },
-            { name: "green", value: "lawngreen" },
-            { name: "purple", value: "purple" }
+                { name: "default", value: "" },
+                { name: "black", value: "black" },
+                { name: "red", value: "red" },
+                { name: "blue", value: "blue" },
+                { name: "#red", value: "#ff0000" },
+                { name: "#blue", value: "#0000ff" },
+                { name: "#r", value: "#f00" },
+                { name: "#b", value: "#00f" },
+                { name: "light", value: "#b5b5b5" },
+                { name: "dark", value: "#4b4b4b" },
+                { name: "green", value: "lawngreen" },
+                { name: "purple", value: "purple" }
             ];
 
             let width = 20 + 34 * values.length;
@@ -183,7 +183,7 @@ const RootComponent = {
                 document.getElementsByTagName('html')[0].classList.remove('darkmode');
         },
         svg(newValue, oldValue) {
-            this.parameters = getParameters(this.svg.svg);
+            this.parameters = this.getParameters(this.svg.svg);
         }
     }
 }
@@ -221,7 +221,7 @@ app.component("parameter", {
 
 function evalInScope(js, contextAsScope) {
     //# Return the results of the in-line anonymous function we .call with the passed context
-    return function () { with (this) { return eval(js); }; }.call(contextAsScope);
+    return function() { with(this) { return eval(js); }; }.call(contextAsScope);
 }
 
 app.component("svg-renderer", {
