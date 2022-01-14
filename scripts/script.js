@@ -4,6 +4,7 @@ const RootComponent = {
         return {
             darkMode: true,
             allowCode: false,
+            grid: { x: 1, y: 1 },
             svgUrl: "",
             svgFile: "",
             svg: {
@@ -15,6 +16,8 @@ const RootComponent = {
     },
     methods: {
         getSvg() {
+            return getDarkModeTestSvg();
+
             return `<svg>
             <line x1="0" x2="300" y1="0" y2="0"/>
             <text x="10" y="10">{{m:range(min:0.1,max:2,step:0.1)|1}}</text>
@@ -27,9 +30,6 @@ const RootComponent = {
                 <path d="{{{ (()=>{var d=''; for(var x=0;x<=100;x++){d+=(x==0?'M':'L')+x+' '+(100-((x+c)*(x+c)*m+b*100)/100);} return d;})() }}}" stroke="red" fill="none" stroke-width="1"/>
             </g>
             </svg>`;
-        },
-        forceRerender() {
-            this.componentKey += 1;
         },
         loadFile() {
             this.$refs.fileInput.click();
@@ -51,7 +51,7 @@ const RootComponent = {
                 event.target.value = null;
             }
         },
-        getParameters(svg) {
+        getParameters(svg, grid) {
             let parameterRegex = /\{\{(?<name>[^:}|]*)(:(?<type>[^|}]*))?(\|(?<defaultValue>[^}]*))?\}\}(?=[^}])/gm;
             let match;
             let parameters = [];
@@ -121,19 +121,45 @@ const RootComponent = {
                 }
             } while (match);
 
-            return parameters;
+            var groups = [];
+
+            let repX;
+            let repY;
+             if (grid) {
+                repX = grid.x;
+                repY = grid.y;
+            } else 
+            {
+                repX = 1;
+                repY = 1;
+            }
+
+            for (let x = 0; x < repX; x++)
+                for (let y = 0; y < repY; y++) {
+                    let clone = JSON.parse(JSON.stringify(parameters));
+                    groups.push(clone);
+                }
+
+            return groups;
         }
 
     },
     watch: {
-        darkMode(newValue, oldValue) {
+        darkMode(newValue) {
             if (newValue)
                 document.getElementsByTagName('html')[0].classList.add('darkmode');
             else
                 document.getElementsByTagName('html')[0].classList.remove('darkmode');
         },
-        svg(newValue, oldValue) {
-            this.parameters = this.getParameters(this.svg.svg);
+        svg() {
+            this.parameters = this.getParameters(this.svg.svg, this.grid);
+        },
+        grid: {
+            handler() {
+                console.log("grid");
+                this.parameters = this.getParameters(this.svg.svg, this.grid);
+            },
+            deep: true
         }
     }
 }
@@ -171,7 +197,7 @@ app.component("parameter", {
 
 function evalInScope(js, contextAsScope) {
     //# Return the results of the in-line anonymous function we .call with the passed context
-    return function() { with(this) { return eval(js); }; }.call(contextAsScope);
+    return function () { with (this) { return eval(js); }; }.call(contextAsScope);
 }
 
 app.component("svg-renderer", {
@@ -196,12 +222,12 @@ app.component("svg-renderer", {
         };
     },
     methods: {
-        renderParameters(text) {
+        renderParameters(text, parameters) {
             text;
             //replace calculations
             if (this.allowCode) {
                 let scope = {};
-                for (let param of this.parameters)
+                for (let param of parameters)
                     scope[param.name] = param.value;
 
                 let match;
@@ -224,7 +250,7 @@ app.component("svg-renderer", {
                 while (match);
             }
 
-            for (let param of this.parameters) {
+            for (let param of parameters) {
                 //replace parameters
                 let match
                 do {
@@ -238,8 +264,8 @@ app.component("svg-renderer", {
             return text;
         },
         renderSvg() {
-            let renderedSvg = this.renderParameters(this.svg.svg);
-            
+            let renderedSvg = this.renderParameters(this.svg.svg, this.parameters[0]);
+
             if (this.$refs.svgMeasure) {
                 this.$refs.svgMeasure.innerHTML = renderedSvg;
                 let bbox = this.$refs.svgMeasure.children[0].getBBox({ stroke: true });
@@ -258,7 +284,7 @@ app.component("svg-renderer", {
             }
 
             this.renderedSvg = renderedSvg;
-            this.filename = this.renderParameters(this.svg.name)
+            this.filename = this.renderParameters(this.svg.name, this.parameters[0])
         },
         saveSvg() {
             this.triggerDownload('data:image/svg+xml;base64,' + Base64.encode(this.renderedSvg));

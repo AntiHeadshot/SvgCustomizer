@@ -25,7 +25,11 @@
             </div>
         </div>
         <div id="parameterArea">
-            <parameter v-for="parameter in parameters" :key="parameter" :parameter="parameter" @input="parameter.value = $event.newValue"></parameter>
+            <label>GridX<input type="number" min="1" v-model.number="grid.x"/></label><br/>
+            <label>GridY<input type="number" min="1" v-model.number="grid.y"/></label>
+           <div v-for="parametersGroup in parameters">
+                <parameter v-for="parameter in parametersGroup" :key="parameter" :parameter="parameter" @input="parameter.value = $event.newValue"></parameter>
+            </div>
         </div>
         <div id="svgArea">
             <svg style="display: none">
